@@ -204,22 +204,16 @@ class JukeTube extends EventEmitter {
    * @private
    * @ignore
    */
-  async _handleSong(message, song, skip = false, startTime = 0) {
+  async _handleSong(message, song, skip = false) {
     if (!song) return;
     if (Array.isArray(song)) this._handlePlaylist(message, song, skip);
     else if (this.getQueue(message)) {
       let queue = this._addToQueue(message, song, skip);
       if (skip) this.skip(message);
-      if(startTime !== 0) {
-        song.startTime = startTime
-      }
       else this.emit("addSong", message, queue, song);
     } else {
       let queue = await this._newQueue(message, song);
       this.getQueue(message)
-      if(startTime !== 0) {
-        song.startTime = startTime
-      }
       this.emit("playSong", message, queue, song);
     }
   }
@@ -820,26 +814,6 @@ class JukeTube extends EventEmitter {
     if (!queue) throw new Error("NotPlaying");
     queue.beginTime = time;
     this._playSong(message);
-  }
-
-  /**
-   * `@2.7.0` Skip by certain amount of seconds
-   *
-   * @param {Discord.Message} message The message from guild channel
-   * @param {number} time Time in milliseconds
-   * @example
-   * client.on('message', message => {
-   *     if (!message.content.startsWith(config.prefix)) return;
-   *     const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
-   *     const command = args.shift();
-   *     if (command = 'seek')
-   *         JukeTube.skiptime(message, Number(args[0]));
-   * });
-   */
-   skiptime(message, time) {
-    let queue = this.getQueue(message);
-    if (!queue) throw new Error("NotPlaying");
-    this._playSong(message, false, queue.songs[0].duration * 1000 + time);
   }
 
   /**
