@@ -211,7 +211,7 @@ class JukeTube extends EventEmitter {
       let queue = this._addToQueue(message, song, skip);
       if (skip) this.skip(message);
       if(songTime !== 0) {
-        song.startTime = startTime
+        queue.startTime = startTime
       }
       else this.emit("addSong", message, queue, song);
     } else {
