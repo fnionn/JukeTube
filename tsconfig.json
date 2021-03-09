@@ -1,5 +1,5 @@
 {
-    "files": ["src/DisTube.js"],
+    "files": ["src/JukeTube.js"],
     "exclude": [
         "node_modules"
     ],

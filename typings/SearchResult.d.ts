@@ -18,6 +18,7 @@ declare class SearchResult {
     name: string;
     /**
      * Song duration.
+     * 
      * @type {number}
      */
     duration: number;

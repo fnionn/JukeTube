@@ -62,9 +62,9 @@ declare class Queue {
     /**
      * `@2.0.0` Queue audio filter.
      * Available filters: {@link Filter}
-     * @type {DisTube.Filter}
+     * @type {JukeTube.Filter}
      */
-    filter: DisTube.Filter;
+    filter: JukeTube.Filter;
     /**
      * `@2.2.0` Message which initialize the queue
      * @type {Discord.Message}
@@ -103,4 +103,4 @@ declare class Queue {
 }
 import Discord = require("discord.js");
 import Song = require("./Song");
-import DisTube = require("./DisTube");
+import JukeTube = require("./JukeTube");

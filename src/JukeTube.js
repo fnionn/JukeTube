@@ -20,21 +20,21 @@ const isURL = string => {
 const parseNumber = string => (typeof string === "string" ? Number(string.replace(/\D+/g, "")) : Number(string)) || 0;
 
 /**
- * DisTube options.
- * @typedef {object} DisTubeOptions
- * @prop {boolean} [emitNewSongOnly=false] `@1.3.0`. If `true`, {@link DisTube#event:playSong} is not emitted when looping a song or next song is the same as the previous one
+ * JukeTube options.
+ * @typedef {object} JukeTubeOptions
+ * @prop {boolean} [emitNewSongOnly=false] `@1.3.0`. If `true`, {@link JukeTube#event:playSong} is not emitted when looping a song or next song is the same as the previous one
  * @prop {number} [highWaterMark=1<<24] `@2.2.0` ytdl's highWaterMark option.
  * @prop {boolean} [leaveOnEmpty=true] Whether or not leaving voice channel if channel is empty in 60s. (Avoid accident leaving)
  * @prop {boolean} [leaveOnFinish=false] Whether or not leaving voice channel when the queue ends.
- * @prop {boolean} [leaveOnStop=true] Whether or not leaving voice channel after using {@link DisTube#stop|stop()} function.
- * @prop {boolean} [searchSongs=false] Whether or not searching for multiple songs to select manually, DisTube will play the first result if `false`
+ * @prop {boolean} [leaveOnStop=true] Whether or not leaving voice channel after using {@link JukeTube#stop|stop()} function.
+ * @prop {boolean} [searchSongs=false] Whether or not searching for multiple songs to select manually, JukeTube will play the first result if `false`
  * @prop {string} [youtubeCookie=null] `@2.4.0` YouTube cookies. How to get it: {@link https://github.com/fent/node-ytdl-core/blob/784c04eaf9f3cfac0fe0933155adffe0e2e0848a/example/cookies.js#L6-L12|YTDL's Example}
  * @prop {string} [youtubeIdentityToken=null] `@2.4.0` If not given, ytdl-core will try to find it. You can find this by going to a video's watch page, viewing the source, and searching for "ID_TOKEN".
  * @prop {boolean} [youtubeDL=true] `@2.8.0` Whether or not using youtube-dl.
  * @prop {boolean} [updateYouTubeDL=true] `@2.8.0` Whether or not updating youtube-dl automatically.
  * @prop {Object.<string, string>} [customFilters] `@2.7.0` Override or add more ffmpeg filters. Example: `{ "Filter name": "Filter value", "8d": "apulsator=hz=0.075" }`
  */
-const DisTubeOptions = {
+const JukeTubeOptions = {
   highWaterMark: 1 << 24,
   emitNewSongOnly: false,
   leaveOnEmpty: true,
@@ -49,7 +49,7 @@ const DisTubeOptions = {
 };
 
 /**
- * DisTube audio filters.
+ * JukeTube audio filters.
  * @typedef {("3d"|"bassboost"|"echo"|"karaoke"|"nightcore"|"vaporwave"|"flanger"|"gate"|"haas"|"reverse"|"surround"|"mcompand"|"phaser"|"tremolo"|"earwax"|string)} Filter
  * @prop {string} 3d `@2.0.0`
  * @prop {string} bassboost `@2.0.0`
@@ -86,28 +86,28 @@ const ffmpegFilters = {
 }
 
 /**
- * Class representing a DisTube.
+ * Class representing a JukeTube.
  * @extends EventEmitter
  */
-class DisTube extends EventEmitter {
+class JukeTube extends EventEmitter {
   /**
-   * DisTube's current version.
+   * JukeTube's current version.
    * @type {string}
    * @ignore
    */
   get version() { return require("../package.json").version }
   static get version() { return require("../package.json").version }
   /**
-   * Create new DisTube.
+   * Create new JukeTube.
    * @param {Discord.Client} client Discord.JS client
-   * @param {DisTubeOptions} [otp={}] Custom DisTube options
+   * @param {JukeTubeOptions} [otp={}] Custom JukeTube options
    * @example
    * const Discord = require('discord.js'),
-   *     DisTube = require('distube'),
+   *     JukeTube = require('JukeTube'),
    *     client = new Discord.Client();
-   * // Create a new DisTube
-   * const distube = new DisTube(client, { searchSongs: true });
-   * // client.DisTube = distube // make it access easily
+   * // Create a new JukeTube
+   * const JukeTube = new JukeTube(client, { searchSongs: true });
+   * // client.JukeTube = JukeTube // make it access easily
    * client.login("Your Discord Bot Token")
    */
   constructor(client, otp = {}) {
@@ -127,14 +127,14 @@ class DisTube extends EventEmitter {
     this.guildQueues = new Discord.Collection();
 
     /**
-     * DisTube options
-     * @type {DisTubeOptions}
+     * JukeTube options
+     * @type {JukeTubeOptions}
      */
-    this.options = DisTubeOptions;
+    this.options = JukeTubeOptions;
     Object.assign(this.options, otp);
 
     /**
-     * DisTube filters
+     * JukeTube filters
      * @type {Filter}
      */
     this.filters = ffmpegFilters;
@@ -166,9 +166,9 @@ class DisTube extends EventEmitter {
 
     if (this.options.updateYouTubeDL) {
       require("@distube/youtube-dl/lib/downloader")()
-        .then(message => console.log(`[DisTube] ${message}`))
+        .then(message => console.log(`[JukeTube] ${message}`))
         .catch(console.error)
-        .catch(() => console.log("[DisTube] Unable to update youtube-dl, using default version."));
+        .catch(() => console.log("[JukeTube] Unable to update youtube-dl, using default version."));
     }
   }
 
@@ -229,7 +229,7 @@ class DisTube extends EventEmitter {
    *     const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
    *     const command = args.shift();
    *     if (command == "play")
-   *         distube.play(message, args.join(" "));
+   *         JukeTube.play(message, args.join(" "));
    * });
    */
   async play(message, song) {
@@ -254,7 +254,7 @@ class DisTube extends EventEmitter {
    *     const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
    *     const command = args.shift();
    *     if (command == "playSkip")
-   *         distube.playSkip(message, args.join(" "));
+   *         JukeTube.playSkip(message, args.join(" "));
    * });
    */
   async playSkip(message, song) {
@@ -270,7 +270,7 @@ class DisTube extends EventEmitter {
 
   /**
    * `@2.1.0` Play or add array of Youtube video urls.
-   * {@link DisTube#event:playList} or {@link DisTube#event:addList} will be emitted
+   * {@link JukeTube#event:playList} or {@link JukeTube#event:addList} will be emitted
    * with `playlist`'s properties include `properties` parameter's properties such as
    * `user`, `songs`, `duration`, `formattedDuration`, `thumbnail` like {@link Playlist}
    * @async
@@ -280,7 +280,7 @@ class DisTube extends EventEmitter {
    * @param {boolean} [playSkip=false] Whether or not play this playlist instantly
    * @example
    *     let songs = ["https://www.youtube.com/watch?v=xxx", "https://www.youtube.com/watch?v=yyy"];
-   *     distube.playCustomPlaylist(message, songs, { name: "My playlist name" });
+   *     JukeTube.playCustomPlaylist(message, songs, { name: "My playlist name" });
    */
   async playCustomPlaylist(message, urls, properties = {}, playSkip = false) {
     if (!urls.length) return;
@@ -330,7 +330,7 @@ class DisTube extends EventEmitter {
 
   /**
    * `@2.0.0` Search for a song. You can customize how user answers instead of send a number.
-   * Then use {@link DisTube#play|play(message, aResultFromSearch)} or {@link DisTube#playSkip|playSkip()} to play it.
+   * Then use {@link JukeTube#play|play(message, aResultFromSearch)} or {@link JukeTube#playSkip|playSkip()} to play it.
    * @async
    * @param {string} string The string search for
    * @throws {NotFound} If not found
@@ -350,7 +350,7 @@ class DisTube extends EventEmitter {
   }
 
   /**
-   * Search for a song, fire {@link DisTube#event:error} if not found.
+   * Search for a song, fire {@link JukeTube#event:error} if not found.
    * @async
    * @private
    * @ignore
@@ -401,7 +401,7 @@ class DisTube extends EventEmitter {
       queue.connection = await voice.join();
     } catch (e) {
       this._deleteQueue(message);
-      e.message = `DisTube cannot join the voice channel!\nReason: ${e.message}`;
+      e.message = `JukeTube cannot join the voice channel!\nReason: ${e.message}`;
       if (retried) throw e;
       return this._newQueue(message, song, true);
     }
@@ -439,7 +439,7 @@ class DisTube extends EventEmitter {
    *     const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
    *     const command = args.shift();
    *     if (command == "queue") {
-   *         let queue = distube.getQueue(message);
+   *         let queue = JukeTube.getQueue(message);
    *         message.channel.send('Current queue:\n' + queue.songs.map((song, id) =>
    *             `**${id+1}**. [${song.name}](${song.url}) - \`${song.formattedDuration}\``
    *         ).join("\n"));
@@ -533,7 +533,7 @@ class DisTube extends EventEmitter {
    *     const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
    *     const command = args.shift();
    *     if (command == "stop") {
-   *         distube.stop(message);
+   *         JukeTube.stop(message);
    *         message.channel.send("Stopped the queue!");
    *     }
    * });
@@ -559,7 +559,7 @@ class DisTube extends EventEmitter {
    *     const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
    *     const command = args.shift();
    *     if (command == "volume")
-   *         distube.setVolume(message, args[0]);
+   *         JukeTube.setVolume(message, args[0]);
    * });
    */
   setVolume(message, percent) {
@@ -583,7 +583,7 @@ class DisTube extends EventEmitter {
    *     const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
    *     const command = args.shift();
    *     if (command == "skip")
-   *         distube.skip(message);
+   *         JukeTube.skip(message);
    * });
    */
   skip(message) {
@@ -605,7 +605,7 @@ class DisTube extends EventEmitter {
    *     const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
    *     const command = args.shift();
    *     if (command == "shuffle")
-   *         distube.shuffle(message);
+   *         JukeTube.shuffle(message);
    * });
    */
   shuffle(message) {
@@ -633,7 +633,7 @@ class DisTube extends EventEmitter {
    *     const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
    *     const command = args.shift();
    *     if (command == "jump")
-   *         distube.jump(message, parseInt(args[0]))
+   *         JukeTube.jump(message, parseInt(args[0]))
    *             .catch(err => message.channel.send("Invalid song number."));
    * });
    */
@@ -662,7 +662,7 @@ class DisTube extends EventEmitter {
    *     const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
    *     const command = args.shift();
    *     if (command == "repeat") {
-   *         let mode = distube.setRepeatMode(message, parseInt(args[0]));
+   *         let mode = JukeTube.setRepeatMode(message, parseInt(args[0]));
    *         mode = mode ? mode == 2 ? "Repeat queue" : "Repeat song" : "Off";
    *         message.channel.send("Set repeat mode to `" + mode + "`");
    *     }
@@ -689,7 +689,7 @@ class DisTube extends EventEmitter {
    *     const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
    *     const command = args.shift();
    *     if (command == "autoplay") {
-   *         let mode = distube.toggleAutoplay(message);
+   *         let mode = JukeTube.toggleAutoplay(message);
    *         message.channel.send("Set autoplay mode to `" + (mode ? "On" : "Off") + "`");
    *     }
    * });
@@ -736,12 +736,12 @@ class DisTube extends EventEmitter {
 
   /**
    * TODO: Remove this
-   * @deprecated use {@link DisTube#addRelatedVideo} instead
-   * @param {DisTube.Message} message Message
+   * @deprecated use {@link JukeTube#addRelatedVideo} instead
+   * @param {JukeTube.Message} message Message
    * @returns {Promise<Queue>}
    */
   runAutoplay(message) {
-    console.warn(`\`DisTube#runAutoplay\` is deprecated, use \`DisTube#addRelatedVideo\` instead.`);
+    console.warn(`\`JukeTube#runAutoplay\` is deprecated, use \`JukeTube#addRelatedVideo\` instead.`);
     return this.addRelatedVideo(message);
   }
 
@@ -779,7 +779,7 @@ class DisTube extends EventEmitter {
    *     const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
    *     const command = args.shift();
    *     if ([`3d`, `bassboost`, `echo`, `karaoke`, `nightcore`, `vaporwave`].includes(command)) {
-   *         let filter = distube.setFilter(message, command);
+   *         let filter = JukeTube.setFilter(message, command);
    *         message.channel.send("Current queue filter: " + (filter || "Off"));
    *     }
    * });
@@ -787,7 +787,7 @@ class DisTube extends EventEmitter {
   setFilter(message, filter) {
     let queue = this.getQueue(message);
     if (!queue) throw new Error("NotPlaying");
-    if (!Object.prototype.hasOwnProperty.call(this.filters, filter)) throw new TypeError(`${filter} is not a Filter (https://DisTube.js.org/global.html#Filter).`);
+    if (!Object.prototype.hasOwnProperty.call(this.filters, filter)) throw new TypeError(`${filter} is not a Filter (https://JukeTube.js.org/global.html#Filter).`);
     if (queue.filter === filter) queue.filter = null;
     else queue.filter = filter;
     queue.beginTime = queue.currentTime;
@@ -806,7 +806,7 @@ class DisTube extends EventEmitter {
    *     const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
    *     const command = args.shift();
    *     if (command = 'seek')
-   *         distube.seek(message, Number(args[0]));
+   *         JukeTube.seek(message, Number(args[0]));
    * });
    */
   seek(message, time) {
@@ -879,7 +879,7 @@ class DisTube extends EventEmitter {
     let song = queue.songs[0];
     try {
       let errorEmitted = false;
-      // Queue.stream.on('info') should works but maybe DisTube#playSong will emit before ytdl#info
+      // Queue.stream.on('info') should works but maybe JukeTube#playSong will emit before ytdl#info
       if (song.youtube && !song.info) {
         let { videoDetails } = song.info = await ytdl.getInfo(song.url, { requestOptions: this.requestOptions });
         song.views = parseNumber(videoDetails.viewCount);
@@ -964,75 +964,75 @@ class DisTube extends EventEmitter {
   }
 }
 
-module.exports = DisTube;
+module.exports = JukeTube;
 
 /**
- *  Emitted after DisTube add playlist to guild queue
+ *  Emitted after JukeTube add playlist to guild queue
  *
- * @event DisTube#addList
+ * @event JukeTube#addList
  * @param {Discord.Message} message The message from guild channel
  * @param {Queue} queue The guild queue
  * @param {Playlist} playlist Playlist info
  * @since 1.1.0
  * @example
  * const status = (queue) => `Volume: \`${queue.volume}%\` | Loop: \`${queue.repeatMode ? queue.repeatMode == 2 ? "Server Queue" : "This Song" : "Off"}\` | Autoplay: \`${queue.autoplay ? "On" : "Off"}\``;
- * distube.on("addList", (message, queue, playlist) => message.channel.send(
+ * JukeTube.on("addList", (message, queue, playlist) => message.channel.send(
  *     `Added \`${playlist.name}\` playlist (${playlist.songs.length} songs) to queue\n${status(queue)}`
  * ));
  */
 
 /**
- *  Emitted after DisTube add new song to guild queue
+ *  Emitted after JukeTube add new song to guild queue
  *
- * @event DisTube#addSong
+ * @event JukeTube#addSong
  * @param {Discord.Message} message The message from guild channel
  * @param {Queue} queue The guild queue
  * @param {Song} song Added song
  * @example
  * const status = (queue) => `Volume: \`${queue.volume}%\` | Loop: \`${queue.repeatMode ? queue.repeatMode == 2 ? "Server Queue" : "This Song" : "Off"}\` | Autoplay: \`${queue.autoplay ? "On" : "Off"}\``;
- * distube.on("addSong", (message, queue, song) => message.channel.send(
+ * JukeTube.on("addSong", (message, queue, song) => message.channel.send(
  *     `Added ${song.name} - \`${song.formattedDuration}\` to the queue by ${song.user}`
  * ));
  */
 
 /**
- * Emitted when there is no user in VoiceChannel and {@link DisTubeOptions}.leaveOnEmpty is `true`.
+ * Emitted when there is no user in VoiceChannel and {@link JukeTubeOptions}.leaveOnEmpty is `true`.
  *
- * @event DisTube#empty
+ * @event JukeTube#empty
  * @param {Discord.Message} message The message from guild channel
  * @example
- * distube.on("empty", message => message.channel.send("Channel is empty. Leaving the channel"))
+ * JukeTube.on("empty", message => message.channel.send("Channel is empty. Leaving the channel"))
  */
 
 /**
- * Emitted when {@link DisTube} encounters an error.
+ * Emitted when {@link JukeTube} encounters an error.
  *
- * @event DisTube#error
+ * @event JukeTube#error
  * @param {Discord.Message} message The message from guild channel
  * @param {Error} err The error encountered
  * @example
- * distube.on("error", (message, err) => message.channel.send(
+ * JukeTube.on("error", (message, err) => message.channel.send(
  *     "An error encountered: " + err
  * ));
  */
 
 /**
  * Emitted when there is no more song in the queue and {@link Queue#autoplay} is `false`.
- * DisTube will leave voice channel if {@link DisTubeOptions}.leaveOnFinish is `true`
+ * JukeTube will leave voice channel if {@link JukeTubeOptions}.leaveOnFinish is `true`
  *
- * @event DisTube#finish
+ * @event JukeTube#finish
  * @param {Discord.Message} message The message from guild channel
  * @example
- * distube.on("finish", message => message.channel.send("No more song in queue"));
+ * JukeTube.on("finish", message => message.channel.send("No more song in queue"));
  */
 
 /**
- * `@2.3.0` Emitted when DisTube initialize a queue to change queue default properties.
+ * `@2.3.0` Emitted when JukeTube initialize a queue to change queue default properties.
  *
- * @event DisTube#initQueue
+ * @event JukeTube#initQueue
  * @param {Queue} queue The guild queue
  * @example
- * distube.on("initQueue", queue => {
+ * JukeTube.on("initQueue", queue => {
  *     queue.autoplay = false;
  *     queue.volume = 100;
  * });
@@ -1040,67 +1040,67 @@ module.exports = DisTube;
 
 /**
  * Emitted when {@link Queue#autoplay} is `true`, the {@link Queue#songs} is empty and
- * DisTube cannot find related songs to play
+ * JukeTube cannot find related songs to play
  *
- * @event DisTube#noRelated
+ * @event JukeTube#noRelated
  * @param {Discord.Message} message The message from guild channel
  * @example
- * distube.on("noRelated", message => message.channel.send("Can't find related video to play. Stop playing music."));
+ * JukeTube.on("noRelated", message => message.channel.send("Can't find related video to play. Stop playing music."));
  */
 
 /**
- * Emitted after DisTube play the first song of the playlist
+ * Emitted after JukeTube play the first song of the playlist
  * and add the rest to the guild queue
  *
- * @event DisTube#playList
+ * @event JukeTube#playList
  * @param {Discord.Message} message The message from guild channel
  * @param {Queue} queue The guild queue
  * @param {Playlist} playlist Playlist info
  * @param {Song} song Playing song
  * @example
  * const status = (queue) => `Volume: \`${queue.volume}%\` | Loop: \`${queue.repeatMode ? queue.repeatMode == 2 ? "Server Queue" : "This Song" : "Off"}\` | Autoplay: \`${queue.autoplay ? "On" : "Off"}\``;
- * distube.on("playList", (message, queue, playlist, song) => message.channel.send(
+ * JukeTube.on("playList", (message, queue, playlist, song) => message.channel.send(
  *     `Play \`${playlist.name}\` playlist (${playlist.songs.length} songs).\nRequested by: ${song.user}\nNow playing \`${song.name}\` - \`${song.formattedDuration}\`\n${status(queue)}`
  * ));
  */
 
 /**
- * Emitted when DisTube play a song.
- * If {@link DisTubeOptions}.emitNewSongOnly is `true`, event is not emitted when looping a song or next song is the previous one
+ * Emitted when JukeTube play a song.
+ * If {@link JukeTubeOptions}.emitNewSongOnly is `true`, event is not emitted when looping a song or next song is the previous one
  *
- * @event DisTube#playSong
+ * @event JukeTube#playSong
  * @param {Discord.Message} message The message from guild channel
  * @param {Queue} queue The guild queue
  * @param {Song} song Playing song
  * @example
  * const status = (queue) => `Volume: \`${queue.volume}%\` | Loop: \`${queue.repeatMode ? queue.repeatMode == 2 ? "Server Queue" : "This Song" : "Off"}\` | Autoplay: \`${queue.autoplay ? "On" : "Off"}\``;
- * distube.on("playSong", (message, queue, song) => message.channel.send(
+ * JukeTube.on("playSong", (message, queue, song) => message.channel.send(
  *     `Playing \`${song.name}\` - \`${song.formattedDuration}\`\nRequested by: ${song.user}\n${status(queue)}`
  * ));
  */
 
 /**
- * Emitted when {@link DisTubeOptions}.searchSongs is `true`.
+ * Emitted when {@link JukeTubeOptions}.searchSongs is `true`.
  * Search will be canceled if user's next message is invalid number or timeout (60s)
  *
- * @event DisTube#searchCancel
+ * @event JukeTube#searchCancel
  * @param {Discord.Message} message The message from guild channel
  * @example
- * // DisTubeOptions.searchSongs = true
- * distube.on("searchCancel", (message) => message.channel.send(`Searching canceled`));
+ * // JukeTubeOptions.searchSongs = true
+ * JukeTube.on("searchCancel", (message) => message.channel.send(`Searching canceled`));
  */
 
 /**
- * Emitted when {@link DisTubeOptions}.searchSongs is `true`.
- * DisTube will wait for user's next message to choose song manually
- * if song param of {@link DisTube#play|play()} is invalid url
+ * Emitted when {@link JukeTubeOptions}.searchSongs is `true`.
+ * JukeTube will wait for user's next message to choose song manually
+ * if song param of {@link JukeTube#play|play()} is invalid url
  *
- * @event DisTube#searchResult
+ * @event JukeTube#searchResult
  * @param {Discord.Message} message The message from guild channel
  * @param {SearchResult[]} result Searched result (max length = 12)
  * @example
- * // DisTubeOptions.searchSongs = true
- * distube.on("searchResult", (message, result) => {
+ * // JukeTubeOptions.searchSongs = true
+ * JukeTube.on("searchResult", (message, result) => {
  *     let i = 0;
  *     message.channel.send(`**Choose an option from below**\n${result.map(song => `**${++i}**. ${song.name} - \`${song.formattedDuration}\``).join("\n")}\n*Enter anything else or wait 60 seconds to cancel*`);
  * });

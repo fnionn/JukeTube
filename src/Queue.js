@@ -2,7 +2,7 @@
 const { formatDuration } = require("./duration"),
   Discord = require("discord.js"),
   Song = require("./Song"),
-  DisTube = require("./DisTube");
+  DisTube = require("./JukeTube");
 
 /**
  * Represents a queue.
