@@ -204,12 +204,15 @@ class JukeTube extends EventEmitter {
    * @private
    * @ignore
    */
-  async _handleSong(message, song, skip = false) {
+  async _handleSong(message, song, skip = false, startTime = 0) {
     if (!song) return;
     if (Array.isArray(song)) this._handlePlaylist(message, song, skip);
     else if (this.getQueue(message)) {
       let queue = this._addToQueue(message, song, skip);
       if (skip) this.skip(message);
+      if(songTime !== 0) {
+        song.startTime = startTime
+      }
       else this.emit("addSong", message, queue, song);
     } else {
       let queue = await this._newQueue(message, song);
@@ -833,8 +836,7 @@ class JukeTube extends EventEmitter {
    skiptime(message, time) {
     let queue = this.getQueue(message);
     if (!queue) throw new Error("NotPlaying");
-    queue.beginTime = queue.songs[0].duration * 1000 + time;
-    this._playSong(message);
+    this._playSong(message, false, queue.songs[0].duration * 1000 + time);
   }
 
   /**
