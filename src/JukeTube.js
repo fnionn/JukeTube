@@ -817,6 +817,27 @@ class JukeTube extends EventEmitter {
   }
 
   /**
+   * `@2.7.0` Skip by certain amount of seconds
+   *
+   * @param {Discord.Message} message The message from guild channel
+   * @param {number} time Time in milliseconds
+   * @example
+   * client.on('message', message => {
+   *     if (!message.content.startsWith(config.prefix)) return;
+   *     const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
+   *     const command = args.shift();
+   *     if (command = 'seek')
+   *         JukeTube.skiptime(message, Number(args[0]));
+   * });
+   */
+   skiptime(message, time) {
+    let queue = this.getQueue(message);
+    if (!queue) throw new Error("NotPlaying");
+    queue.beginTime = queue.songs[0].duration * 1000 + time;
+    this._playSong(message);
+  }
+
+  /**
    * Emit error event
    * @private
    * @ignore
