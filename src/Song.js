@@ -2,7 +2,7 @@
 /* eslint no-unused-vars: "off" */
 const { formatDuration, toSecond } = require("./duration"),
   Discord = require("discord.js"),
-  ytdl = require("ytdl-core");
+  ytdl = require("ytdl-core-discord");
 
 const deprecate = (obj, oldProp, value, newProp = null) => {
   Object.defineProperty(obj, oldProp, {

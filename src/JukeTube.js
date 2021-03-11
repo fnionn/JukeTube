@@ -1,4 +1,4 @@
-const ytdl = require("@distube/ytdl"),
+const ytdl = require("ytdl-core-discord"),
   ytsr = require("@distube/ytsr"),
   ytpl = require("@distube/ytpl"),
   { EventEmitter } = require("events"),

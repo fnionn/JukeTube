@@ -45,7 +45,7 @@
     "@distube/ytdl": "^1.0.7",
     "@distube/ytpl": "^1.0.11",
     "@distube/ytsr": "^1.0.8",
-    "ytdl-core": "^4.5.0"
+    "ytdl-core-discord": "^1.2.5"
   },
   "devDependencies": {
     "@discordjs/opus": "^0.4.0",
